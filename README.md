@@ -12,7 +12,7 @@ The Tasks:
   4. Train a baseline model to predict the sale price of a house, test it on a testing dataset.
   5. Train a comparison model to predict the sale price of a house, test it on a testing dataset.
 
-This project was written in R. The final code for the project was written by me in DataCamp's DataLab Notebook interface. Helper functions for data cleaning were written by me using RStudio Ver. 2025.09.2+418.
+This project was written in R. The final code for the project was written by me in DataCamp's DataLab Notebook interface, using the tidyverse and randomForest packages. Helper functions for data cleaning were written by me using RStudio Ver. 2025.09.2+418. Conversion from Jupyter Notebook to R Markdown was done using R's jsonlite package.
 
 To run this code for yourself:
   1. Download the R Markdown or R script file, house_sales.csv, validation.csv, and train.csv files in this repo.
