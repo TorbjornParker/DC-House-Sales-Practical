@@ -1,0 +1,263 @@
+---
+title: An R Markdown document converted from "notebook.ipynb"
+output: html_document
+---
+
+# Practical Exam: House sales
+
+RealAgents is a real estate company that focuses on selling houses.
+
+RealAgents sells a variety of types of house in one metropolitan area.
+
+Some houses sell slowly and sometimes require lowering the price in order to find a buyer.
+
+In order to stay competitive, RealAgents would like to optimize the listing prices of the houses it is trying to sell.
+
+They want to do this by predicting the sale price of a house given its characteristics.
+
+If they can predict the sale price in advance, they can decrease the time to sale.
+
+
+## Data
+
+The dataset contains records of previous houses sold in the area.
+
+| Column Name | Criteria                                                |
+|-------------|---------------------------------------------------------|
+| house_id    | Nominal. </br> Unique identifier for houses. </br>Missing values not possible. |
+| city        | Nominal. </br>The city in which the house is located. One of 'Silvertown', 'Riverford', 'Teasdale' and 'Poppleton'. </br>Replace missing values with "Unknown". |
+| sale_price  | Discrete. </br>The sale price of the house in whole dollars. Values can be any positive number greater than or equal to zero.</br>Remove missing entries. |
+| sale_date   | Discrete. </br>The date of the last sale of the house. </br>Replace missing values with 2023-01-01. |
+| months_listed  | Continuous. </br>The number of months the house was listed on the market prior to its last sale, rounded to one decimal place. </br>Replace missing values with mean number of months listed, to one decimal place. |
+| bedrooms    | Discrete. </br>The number of bedrooms in the house. Any positive values greater than or equal to zero. </br>Replace missing values with the mean number of bedrooms, rounded to the nearest integer. |
+| house_type   | Ordinal. </br>One of "Terraced" (two shared walls), "Semi-detached" (one shared wall), or "Detached" (no shared walls). </br>Replace missing values with the most common house type. |
+| area      | Continuous. </br>The area of the house in square meters, rounded to one decimal place. </br>Replace missing values with the mean, to one decimal place. |
+
+# Task 1
+
+The team at RealAgents knows that the city that a property is located in makes a difference to the sale price. 
+
+Unfortuntately they believe that this isn't always recorded in the data. 
+
+Calculate the number of missing values of the `city`. 
+
+ - You should use the data in the file "house_sales.csv". 
+
+ - Your output should be an object `missing_city`, that contains the number of missing values in this column. 
+
+```{r, results="hide"}
+
+# Use this cell to write your code for Task 1
+
+library(tidyverse)
+
+# Helper functions for counting/identifying:
+print_nonmatch <- function(variable, target_categories) {
+  nonmatch_strings <- variable[!variable %in% target_categories]
+  intro_string <- stringr::str_c("Nonmatched strings in ", 
+                       deparse(substitute(variable)),
+                       ":")
+  print(append(intro_string, unique(nonmatch_strings)))
+  count_string <- stringr::str_c("Number of nonmatched strings in ",
+                                 deparse(substitute(variable)),
+                                 ":")
+  print(append(count_string, length(nonmatch_strings)))
+}
+
+count_na <- function(variable) {
+  na_count <- sum(is.na(variable))
+  print(stringr::str_c("Number of NAs in ", 
+                       deparse(substitute(variable)), 
+                       ": ", as.character(na_count)))
+}
+
+# Load and examine data
+house_sales_pt1 <- read_csv("house_sales.csv")
+str(house_sales_pt1)
+
+# Checking non-conforming categories:
+print_nonmatch(house_sales_pt1$city, 
+               c("Silvertown", "Riverford", "Teasdale", "Poppleton"))
+# There are 73 nonconforming strings, all "--", functionally missing values
+# Counting NAs:
+count_na(house_sales_pt1$city) 
+# There are 0 correct NAs.
+
+# Define object
+missing_city <- 73
+print(missing_city)
+
+```
+
+# Task 2 
+
+Before you fit any models, you will need to make sure the data is clean. 
+
+The table below shows what the data should look like. 
+
+Create a cleaned version of the dataframe. 
+
+ - You should start with the data in the file "house_sales.csv". 
+
+ - Your output should be a dataframe named `clean_data`. 
+
+ - All column names and values should match the table below.
+
+
+| Column Name | Criteria                                                |
+|-------------|---------------------------------------------------------|
+| house_id    | Nominal. </br> Unique identifier for houses. </br>Missing values not possible. |
+| city        | Nominal. </br>The city in which the house is located. One of 'Silvertown', 'Riverford', 'Teasdale' and 'Poppleton' </br>Replace missing values with "Unknown". |
+| sale_price  | Discrete. </br>The sale price of the house in whole dollars. Values can be any positive number greater than or equal to zero.</br>Remove missing entries. |
+| sale_date   | Discrete. </br>The date of the last sale of the house. </br>Replace missing values with 2023-01-01. |
+| months_listed  | Continuous. </br>The number of months the house was listed on the market prior to its last sale, rounded to one decimal place. </br>Replace missing values with mean number of months listed, to one decimal place. |
+| bedrooms    | Discrete. </br>The number of bedrooms in the house. Any positive values greater than or equal to zero. </br>Replace missing values with the mean number of bedrooms, rounded to the nearest integer. |
+| house_type   | Ordinal. </br>One of "Terraced", "Semi-detached", or "Detached". </br>Replace missing values with the most common house type. |
+| area      | Continuous. </br>The area of the house in square meters, rounded to one decimal place. </br>Replace missing values with the mean, to one decimal place. |
+
+```{r Task2}
+
+# Use this cell to write your code for Task 2
+
+# Loading data
+house_sales_pt2 <- read_csv("house_sales.csv")
+
+# Data cleaning
+clean_data <- house_sales_pt2 %>%
+# city: Replace 73x of the "--" with "Unknown", change to factor
+mutate(city = str_replace_all(city, "--", "Unknown"),
+       city = as.factor(city),
+# sale_price: Round to 0 decimal places, convert to integer
+       sale_price = round(sale_price, digits = 0),
+  	   sale_price = as.integer(sale_price),
+# months_listed: replace nas with mean rounded to 1 decimal place
+	     months_listed = replace_na(months_listed, 
+	                                round(mean(months_listed, na.rm = TRUE), 
+	                                      digits = 1)),
+# bedrooms: Round to 0 decimal places, convert to integer
+       bedrooms = round(bedrooms, digits = 0),
+	     bedrooms = as.integer(bedrooms),
+# house_type: Edit abbreviations, convert to ordinal factor (Terr > Semi > Det)
+# Order was chosen since detached units are likely to be the most expensive.
+       house_type = str_replace_all(house_type, 
+                                    c("^Terr.$" = "Terraced", 
+                                      "^Semi$" = "Semi-detached", 
+                                      "^Det.$" = "Detached")),
+		   house_type = factor(house_type, ordered = TRUE, 
+		                       levels = c("Terraced", 
+		                                  "Semi-detached", 
+		                                  "Detached")),
+# area: Remove non-number characters (" sq.m."); convert to numeric; round
+       area = str_remove(area, " sq.m."),
+       area = as.numeric(area),
+       area = round(area, digits = 1)
+)
+
+# Final structure check
+str(clean_data)
+head(clean_data)
+
+```
+
+# Task 3 
+
+The team at RealAgents have told you that they have always believed that the number of bedrooms is the biggest driver of house price. 
+
+Producing a table showing the difference in the average sale price by number of bedrooms along with the variance to investigate this question for the team.
+
+ - You should start with the data in the file 'house_sales.csv'.
+
+ - Your output should be a data frame named `price_by_rooms`. 
+
+ - It should include the three columns `bedrooms`, `avg_price`, `var_price`. 
+
+ - Your answers should be rounded to 1 decimal place.   
+
+```{r Task3}
+
+# Use this cell to write your code for Task 3
+
+price_by_rooms <- clean_data %>%
+group_by(bedrooms) %>%
+summarize(avg_price = round(mean(sale_price), digits = 1), 
+		  var_price = round(var(sale_price), digits = 1)
+		 )
+View(price_by_rooms)
+
+```
+
+# Task 4
+
+Fit a baseline model to predict the sale price of a house.
+
+ 1. Fit your model using the data contained in “train.csv” </br></br>
+
+ 2. Use “validation.csv” to predict new values based on your model. You must return a dataframe named `base_result`, that includes `house_id` and `price`. The price column must be your predicted values.
+
+```{r Task4}
+# Use this cell to write your code for Task 4
+
+training_data <- read_csv("train.csv")
+test_data <- read_csv("validation.csv")
+
+bedrooms_model <- lm(sale_price ~ bedrooms, data = training_data)
+base_result <- test_data %>%
+mutate(price = predict(bedrooms_model, newdata = test_data)) %>%
+select(house_id, price)
+head(base_result)
+
+```
+
+# Task 5
+
+Fit a comparison model to predict the sale price of a house.
+
+ 1. Fit your model using the data contained in “train.csv” </br></br>
+
+ 2. Use “validation.csv” to predict new values based on your model. You must return a dataframe named `compare_result`, that includes `house_id` and `price`. The price column must be your predicted values.
+
+```{r Task5}
+# Use this cell to write your code for Task 5
+library(randomForest)
+
+# Conversion of training and test data to include ordinal factors
+training_data_pt5 <- training_data %>%
+mutate(house_type = factor(house_type, ordered = TRUE, 
+                           levels = c("Terraced", "Semi-detached", "Detached"))) %>%
+mutate(city = factor(city, ordered = FALSE, 
+                     levels = c("Silvertown", "Riverford", "Teasdale", "Poppleton", "Unknown")))
+
+test_data_pt5 <- test_data %>%
+mutate(house_type = factor(house_type, ordered = TRUE, 
+                           levels = c("Terraced", "Semi-detached", "Detached"))) %>%
+mutate(city = factor(city, ordered = FALSE, 
+                     levels = c("Silvertown", "Riverford", "Teasdale", "Poppleton", "Unknown")))
+
+# Initial model creation:
+# Earlier drafts included a much higher nodesize, interaction terms (*), and an 
+# intercept. These were removed.
+forest_model_beta <- randomForest(sale_price ~ city + bedrooms + house_type + area + sale_date, 
+                                  data = training_data_pt5, 
+                                  ntree = 500, mtry = 2, nodesize = 5, importance = TRUE)
+
+# Plot %IncMSE and IncNodePurity of each variable
+# Determines removal of city and sale_date 
+varImpPlot(forest_model_beta)
+
+# Plot changes in error based on ntree
+# Error plateaus around ntree = 200
+plot(forest_model_beta)
+
+# Final model creation
+forest_model_final <- randomForest(sale_price ~ bedrooms + house_type + area, 
+                                   data = training_data_pt5, 
+                                   ntree = 200, mtry = 2, nodesize = 5, 
+                                   importance = TRUE)
+
+# Prediction using model:
+compare_result <- test_data_pt5 %>%
+mutate(price = predict(forest_model_final, newdata = test_data_pt5)) %>%
+select(house_id, price)
+head(compare_result)
+
+```
