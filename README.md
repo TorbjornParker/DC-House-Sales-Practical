@@ -15,8 +15,8 @@ The Tasks:
 This project was written in R. The final code for the project was written by me in DataCamp's DataLab Notebook interface, using the tidyverse and randomForest packages. Helper functions for data cleaning were written by me using RStudio Ver. 2025.09.2+418. Conversion from Jupyter Notebook to R Markdown was done using R's jsonlite package.
 
 To run this code for yourself:
-  1. Download the R Markdown or R script file, house_sales.csv, validation.csv, and train.csv files in this repo.
+  1. Download either the R Markdown or the R script file, as well as `house_sales.csv`, `validation.csv`, and `train.csv` files in this repo.
   2. Run the R Markdown or R script file in RStudio or another R IDE. The filepath for loading files is already set to "Downloads."
-  3. You may need to install the "tidyverse" and "randomForest" following packages before use. To do this, open R Studio and type the following lines of code: `install.packages("tidyverse")` and `install.packages("randomForest")`.
+  3. You may need to install the "tidyverse" and "randomForest" following packages before use, if you have not done so previously. To do this, open R and run: `install.packages("tidyverse")` and `install.packages("randomForest")`.
 
-For further inquiries, contact me on LinkedIn at https://www.linkedin.com/in/torben-parker/, on GitHub, or at torbenjparker@gmail.com.
+For further inquiries, contact me on LinkedIn at https://www.linkedin.com/in/torben-parker/, or on GitHub.
