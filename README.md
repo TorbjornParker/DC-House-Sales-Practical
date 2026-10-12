@@ -20,3 +20,11 @@ To run this code for yourself:
   3. You may need to install the "tidyverse" and "randomForest" following packages before use, if you have not done so previously. To do this, open R and run: `install.packages("tidyverse")` and `install.packages("randomForest")`.
 
 For further inquiries, contact me on LinkedIn at https://www.linkedin.com/in/torben-parker/, or on GitHub.
+
+Citations:
+
+Liaw A, Wiener M (2002). “Classification and Regression by randomForest.” _R News_, *2*(3), #18-22. <https://CRAN.R-project.org/doc/Rnews/>.
+
+R Core Team (2025). _R: A Language and Environment for Statistical Computing_. R Foundation for Statistical Computing, Vienna, Austria. <https://www.R-project.org/>.
+
+Wickham H, Averick M, Bryan J, Chang W, McGowan LD, François R, Grolemund G, Hayes A, Henry L, Hester J, Kuhn M, Pedersen TL, Miller E, Bache SM, Müller K, Ooms J, Robinson D, Seidel DP, Spinu V, Takahashi K, Vaughan D, Wilke C, Woo K, Yutani H (2019). “Welcome to the tidyverse.” _Journal of Open Source Software_, *4*(43), 1686. doi:10.21105/joss.01686 <https://doi.org/10.21105/joss.01686>.
