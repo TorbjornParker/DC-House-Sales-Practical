@@ -3,7 +3,6 @@
 # TASK 1
 # Use this cell to write your code for Task 1
 
-setwd("/Users/torbenparker/Downloads")
 library(tidyverse)
 
 # Helper functions for counting/identifying:
